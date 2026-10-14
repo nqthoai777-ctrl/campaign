@@ -208,7 +208,7 @@
             gap: 6px;
         }
 
-        /* Ô vị trí mặc định: màu xám, không có số */
+        /* Ô vị trí mặc định */
         .slot {
             width: 62px;
             height: 62px;
@@ -220,55 +220,70 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 2px;
+            padding: 0;
             font-size: 10px;
             cursor: pointer;
             position: relative;
             user-select: none;
             box-sizing: border-box;
+            overflow: hidden;
             transition: all 0.2s;
         }
 
-        /* Khi chọn tướng và vùng còn slot: ô trống màu xanh */
         .slot.selectable {
             border-color: #4ecca3;
             background: rgba(78, 204, 163, 0.15);
         }
 
-        /* Khi chọn tướng nhưng vùng đã full: ô trống màu đỏ */
         .slot.unselectable {
             border-color: var(--accent-color);
             background: rgba(233, 69, 96, 0.15);
             cursor: not-allowed;
         }
 
-        /* Ô đã được đặt tướng */
+        /* Ô đã được đặt tướng có hình nền */
         .slot.filled.ssr {
             border-style: solid;
-            background: rgba(243, 156, 18, 0.2);
             border-color: var(--color-ssr);
-            color: var(--color-ssr);
-            font-weight: bold;
-            cursor: pointer;
         }
 
         .slot.filled.sr {
             border-style: solid;
-            background: rgba(155, 89, 182, 0.2);
             border-color: var(--color-sr);
-            color: var(--color-sr);
-            font-weight: bold;
-            cursor: pointer;
         }
 
         .slot.filled.r {
             border-style: solid;
-            background: rgba(46, 204, 113, 0.2);
             border-color: var(--color-r);
-            color: var(--color-r);
-            font-weight: bold;
-            cursor: pointer;
         }
+
+        /* Hiển thị ảnh bên trong ô */
+        .slot img.hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Tên anh hùng đè lên ảnh phía dưới */
+        .slot .hero-label {
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65);
+            font-size: 10px;
+            font-weight: bold;
+            padding: 1px 0;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .slot.filled.ssr .hero-label { color: var(--color-ssr); }
+        .slot.filled.sr .hero-label { color: var(--color-sr); }
+        .slot.filled.r .hero-label { color: var(--color-r); }
 
         .slot .remove-btn {
             position: absolute;
@@ -285,6 +300,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            z-index: 3;
         }
 
         .slot.filled:hover .remove-btn, .slot.filled:active .remove-btn {
@@ -340,9 +356,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const heroesData = [
-                // FIGHTER
-                { name: 'Lucius', role: 'FIGHTER', rarity: 'SSR' },
-                { name: 'Daena', role: 'FIGHTER', rarity: 'SSR' },
+                // FIGHTER (Có gắn link ảnh cho Lucius và Daena)
+                { name: 'Lucius', role: 'FIGHTER', rarity: 'SSR', image: 'lucius.png' },
+                { name: 'Daena', role: 'FIGHTER', rarity: 'SSR', image: 'daena.png' },
                 { name: 'Gale', role: 'FIGHTER', rarity: 'SSR' },
                 { name: 'Elduin', role: 'FIGHTER', rarity: 'SSR' },
                 { name: 'Arrely', role: 'FIGHTER', rarity: 'SSR' },
@@ -478,11 +494,17 @@
                     if (heroObj) {
                         const rarityClass = heroObj.rarity.toLowerCase();
                         slot.className = `slot filled ${rarityClass}`;
-                        // Chỉ hiển thị tên anh hùng khi đã đặt vào ô
-                        slot.innerHTML = `
-                            <span style="font-size: 12px; font-weight: bold;">${heroObj.name}</span>
+                        
+                        // Kiểm tra nếu tướng có hình ảnh thì hiển thị thẻ img, nếu không có sẽ chỉ hiện tên
+                        let innerContent = '';
+                        if (heroObj.image) {
+                            innerContent = `<img src="${heroObj.image}" class="hero-img" alt="${heroObj.name}">`;
+                        }
+                        innerContent += `
+                            <span class="hero-label">${heroObj.name}</span>
                             <button class="remove-btn" onclick="unassignSlot(event, '${zoneType}', ${index})">×</button>
                         `;
+                        slot.innerHTML = innerContent;
                     } else {
                         slot.className = 'slot';
                         if (selectedHeroForMobile) {
