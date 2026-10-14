@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dàn Trận Thủ Thành</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --panel-bg: #16213e;
+            --border-color: #0f3460;
+            --accent-color: #e94560;
+            --text-color: #fff;
+            
+            /* Màu sắc độ hiếm */
+            --color-ssr: #f39c12; /* Vàng cam */
+            --color-sr: #9b59b6;  /* Tím */
+            --color-r: #2ecc71;   /* Xanh lá */
+
+            /* Màu sắc các hệ */
+            --role-fighter: #3498db; /* Xanh dương */
+            --role-mage: #9b59b6;    /* Tím */
+            --role-tank: #d35400;    /* Nâu cam */
+            --role-support: #2ecc71; /* Xanh lá */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #4ecca3;
+            text-align: center;
+        }
+
+        .instructions {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .sidebar {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .sidebar h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        /* Thanh Tab chuyển đổi hệ phái */
+        .role-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: #0f3460;
+            border: 1px solid var(--border-color);
+            color: #aaa;
+            padding: 6px 2px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #4ecca3;
+            color: #1a1a2e;
+            border-color: #4ecca3;
+        }
+
+        .hero-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+
+        .hero-item {
+            background: #0f3460;
+            padding: 7px 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .hero-item.selected {
+            background: rgba(78, 204, 163, 0.2);
+            border-color: #4ecca3;
+        }
+
+        .hero-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-name.ssr { color: var(--color-ssr); font-weight: bold; }
+        .hero-name.sr  { color: var(--color-sr); font-weight: bold; }
+        .hero-name.r   { color: var(--color-r); font-weight: bold; }
+
+        .hero-tags {
+            display: flex;
+            gap: 4px;
+        }
+
+        .hero-tag {
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background: #1a1a2e;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .hero-tag.ssr { color: var(--color-ssr); border: 1px solid var(--color-ssr); }
+        .hero-tag.sr  { color: var(--color-sr); border: 1px solid var(--color-sr); }
+        .hero-tag.r   { color: var(--color-r); border: 1px solid var(--color-r); }
+        
+        .hero-tag.fighter { color: var(--role-fighter); border: 1px solid var(--role-fighter); }
+        .hero-tag.mage    { color: var(--role-mage); border: 1px solid var(--role-mage); }
+        .hero-tag.tank    { color: var(--role-tank); border: 1px solid var(--role-tank); }
+        .hero-tag.support { color: var(--role-support); border: 1px solid var(--role-support); }
+
+        .battlefield {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            justify-content: space-between;
+        }
+
+        .section-zone {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f3460;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .counter {
+            background: var(--accent-color);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .counter.valid {
+            background: #4ecca3;
+            color: #1a1a2e;
+        }
+
+        .grid-10 {
+            display: grid;
+            grid-template-columns: repeat(2, 62px);
+            gap: 6px;
+        }
+
+        .grid-15 {
+            display: grid;
+            grid-template-columns: repeat(3, 62px);
+            gap: 6px;
+        }
+
+        /* Ô vị trí mặc định: màu xám, không có số */
+        .slot {
+            width: 62px;
+            height: 62px;
+            border: 2px dashed #555;
+            border-radius: 6px;
+            background: rgba(100, 100, 100, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2px;
+            font-size: 10px;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        /* Khi chọn tướng và vùng còn slot: ô trống màu xanh */
+        .slot.selectable {
+            border-color: #4ecca3;
+            background: rgba(78, 204, 163, 0.15);
+        }
+
+        /* Khi chọn tướng nhưng vùng đã full: ô trống màu đỏ */
+        .slot.unselectable {
+            border-color: var(--accent-color);
+            background: rgba(233, 69, 96, 0.15);
+            cursor: not-allowed;
+        }
+
+        /* Ô đã được đặt tướng */
+        .slot.filled.ssr {
+            border-style: solid;
+            background: rgba(243, 156, 18, 0.2);
+            border-color: var(--color-ssr);
+            color: var(--color-ssr);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .slot.filled.sr {
+            border-style: solid;
+            background: rgba(155, 89, 182, 0.2);
+            border-color: var(--color-sr);
+            color: var(--color-sr);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .slot.filled.r {
+            border-style: solid;
+            background: rgba(46, 204, 113, 0.2);
+            border-color: var(--color-r);
+            color: var(--color-r);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .slot .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            font-size: 9px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .slot.filled:hover .remove-btn, .slot.filled:active .remove-btn {
+            display: flex;
+        }
+
+        .notification {
+            margin-top: 6px;
+            color: var(--accent-color);
+            font-size: 11px;
+            text-align: center;
+            min-height: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dàn Trận Thủ Thành</h1>
+    <div class="instructions">Chọn hệ, chạm tướng rồi chọn ô để xếp hoặc hoán đổi vị trí.</div>
+
+    <div class="game-container">
+        <div class="sidebar">
+            <h3>Danh Sách Tướng</h3>
+            <div class="role-tabs">
+                <button class="tab-btn active" onclick="switchRole('FIGHTER')">FIGHTER</button>
+                <button class="tab-btn" onclick="switchRole('MAGE')">MAGE</button>
+                <button class="tab-btn" onclick="switchRole('TANK')">TANK</button>
+                <button class="tab-btn" onclick="switchRole('SUPPORT')">SUPPORT</button>
+            </div>
+            <div class="hero-list" id="heroList"></div>
+            <div class="notification" id="notification"></div>
+        </div>
+
+        <div class="battlefield">
+            <div class="section-zone">
+                <div class="zone-header">
+                    <span>FORTRESS</span>
+                    <span class="counter" id="counterTop">0/10</span>
+                </div>
+                <div class="grid-10" id="zoneTop"></div>
+            </div>
+
+            <div class="section-zone">
+                <div class="zone-header">
+                    <span>FIELD</span>
+                    <span class="counter" id="counterBottom">0/5</span>
+                </div>
+                <div class="grid-15" id="zoneBottom"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heroesData = [
+                // FIGHTER
+                { name: 'Lucius', role: 'FIGHTER', rarity: 'SSR' },
+                { name: 'Daena', role: 'FIGHTER', rarity: 'SSR' },
+                { name: 'Gale', role: 'FIGHTER', rarity: 'SSR' },
+                { name: 'Elduin', role: 'FIGHTER', rarity: 'SSR' },
+                { name: 'Arrely', role: 'FIGHTER', rarity: 'SSR' },
+                { name: 'Rydel', role: 'FIGHTER', rarity: 'SR' },
+                { name: 'Alphonse', role: 'FIGHTER', rarity: 'SR' },
+                { name: 'Kelean', role: 'FIGHTER', rarity: 'SR' },
+                { name: 'Avniel', role: 'FIGHTER', rarity: 'SR' },
+
+                // MAGE
+                { name: 'Lydia', role: 'MAGE', rarity: 'SSR' },
+                { name: 'Aldrich', role: 'MAGE', rarity: 'SSR' },
+                { name: 'Zania', role: 'MAGE', rarity: 'SSR' },
+                { name: 'Viren', role: 'MAGE', rarity: 'SSR' },
+                { name: 'Gilderion', role: 'MAGE', rarity: 'SSR' },
+                { name: 'Zarkaen', role: 'MAGE', rarity: 'SR' },
+                { name: 'Ludwig', role: 'MAGE', rarity: 'SR' },
+                { name: 'Hikari', role: 'MAGE', rarity: 'SR' },
+                { name: 'Vixara', role: 'MAGE', rarity: 'R' },
+
+                // TANK
+                { name: 'Graldul', role: 'TANK', rarity: 'SSR' },
+                { name: 'Melaena', role: 'TANK', rarity: 'SSR' },
+                { name: 'Reinhard', role: 'TANK', rarity: 'SSR' },
+                { name: 'Eris', role: 'TANK', rarity: 'SSR' },
+                { name: 'Gilli', role: 'TANK', rarity: 'SR' },
+                { name: 'Julian', role: 'TANK', rarity: 'SR' },
+                { name: 'Thaamira', role: 'TANK', rarity: 'SR' },
+
+                // SUPPORT
+                { name: 'Azarish', role: 'SUPPORT', rarity: 'SSR' },
+                { name: 'Miriel', role: 'SUPPORT', rarity: 'SSR' },
+                { name: 'Iki', role: 'SUPPORT', rarity: 'SR' },
+                { name: 'Daphne', role: 'SUPPORT', rarity: 'SR' },
+                { name: 'Mirjam', role: 'SUPPORT', rarity: 'SR' },
+                { name: 'Ami', role: 'SUPPORT', rarity: 'R' },
+                { name: 'Rafaela', role: 'SUPPORT', rarity: 'R' }
+            ];
+
+            const rarityWeight = { 'SSR': 1, 'SR': 2, 'R': 3 };
+            heroesData.sort((a, b) => rarityWeight[a.rarity] - rarityWeight[b.rarity]);
+
+            let topSlots = Array(10).fill(null);
+            let bottomSlots = Array(15).fill(null);
+            let selectedHeroForMobile = null;
+            let currentRole = 'FIGHTER';
+
+            window.switchRole = function(role) {
+                currentRole = role;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    if(btn.innerText.toUpperCase() === role) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                renderHeroList();
+            }
+
+            function initGame() {
+                renderHeroList();
+                renderSlots('zoneTop', topSlots, 10, 'top');
+                renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                updateCounters();
+            }
+
+            function showNotification(msg) {
+                const notif = document.getElementById('notification');
+                notif.innerText = msg;
+                setTimeout(() => {
+                    if(notif.innerText === msg) notif.innerText = '';
+                }, 3000);
+            }
+
+            window.unassignSlot = function(event, zoneType, index) {
+                event.stopPropagation();
+                if (zoneType === 'top') {
+                    topSlots[index] = null;
+                    renderSlots('zoneTop', topSlots, 10, 'top');
+                    renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                } else {
+                    bottomSlots[index] = null;
+                    renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                    renderSlots('zoneTop', topSlots, 10, 'top');
+                }
+                updateCounters();
+            }
+
+            function renderHeroList() {
+                const listEl = document.getElementById('heroList');
+                listEl.innerHTML = '';
+                
+                const filtered = heroesData.filter(h => h.role === currentRole);
+
+                filtered.forEach(hero => {
+                    const rarityClass = hero.rarity.toLowerCase();
+                    const roleClass = hero.role.toLowerCase();
+                    const isSelected = selectedHeroForMobile && selectedHeroForMobile.name === hero.name;
+
+                    const item = document.createElement('div');
+                    item.className = `hero-item ${isSelected ? 'selected' : ''}`;
+                    item.innerHTML = `
+                        <div class="hero-info">
+                            <span class="hero-name ${rarityClass}">${hero.name}</span>
+                        </div>
+                        <div class="hero-tags">
+                            <span class="hero-tag ${rarityClass}">${hero.rarity}</span>
+                            <span class="hero-tag ${roleClass}">${hero.role}</span>
+                        </div>
+                    `;
+                    
+                    item.onclick = () => {
+                        selectedHeroForMobile = hero;
+                        renderHeroList();
+                        renderSlots('zoneTop', topSlots, 10, 'top');
+                        renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                        showNotification(`Đã chọn: ${hero.name} [${hero.rarity}]`);
+                    };
+
+                    listEl.appendChild(item);
+                });
+            }
+
+            function renderSlots(containerId, slotsArray, maxAllowed, zoneType) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                const currentCount = slotsArray.filter(h => h !== null).length;
+                const isFull = currentCount >= maxAllowed;
+
+                slotsArray.forEach((heroObj, index) => {
+                    const slot = document.createElement('div');
+                    
+                    if (heroObj) {
+                        const rarityClass = heroObj.rarity.toLowerCase();
+                        slot.className = `slot filled ${rarityClass}`;
+                        // Chỉ hiển thị tên anh hùng khi đã đặt vào ô
+                        slot.innerHTML = `
+                            <span style="font-size: 12px; font-weight: bold;">${heroObj.name}</span>
+                            <button class="remove-btn" onclick="unassignSlot(event, '${zoneType}', ${index})">×</button>
+                        `;
+                    } else {
+                        slot.className = 'slot';
+                        if (selectedHeroForMobile) {
+                            if (isFull) {
+                                slot.classList.add('unselectable');
+                            } else {
+                                slot.classList.add('selectable');
+                            }
+                        }
+                    }
+
+                    slot.onclick = () => {
+                        if (!selectedHeroForMobile && !heroObj) return;
+
+                        if (!selectedHeroForMobile && heroObj) {
+                            showNotification('Hãy chọn tướng mới từ danh sách để thay thế!');
+                            return;
+                        }
+
+                        if (!heroObj && isFull) {
+                            showNotification(`Khu vực này đã đạt tối đa ${maxAllowed} tướng! Chỉ có thể hoán đổi.`);
+                            return;
+                        }
+
+                        assignHeroToSlot(selectedHeroForMobile, zoneType, index, maxAllowed);
+                        selectedHeroForMobile = null;
+                        renderHeroList();
+                        renderSlots('zoneTop', topSlots, 10, 'top');
+                        renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                    };
+
+                    container.appendChild(slot);
+                });
+            }
+
+            function assignHeroToSlot(heroObj, zoneType, index, maxAllowed) {
+                let targetArray = zoneType === 'top' ? topSlots : bottomSlots;
+                targetArray[index] = heroObj;
+                renderSlots('zoneTop', topSlots, 10, 'top');
+                renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                updateCounters();
+            }
+
+            function updateCounters() {
+                const topCount = topSlots.filter(h => h !== null).length;
+                const bottomCount = bottomSlots.filter(h => h !== null).length;
+
+                const counterTop = document.getElementById('counterTop');
+                const counterBottom = document.getElementById('counterBottom');
+
+                counterTop.innerText = `${topCount}/10`;
+                if(topCount > 0) counterTop.classList.add('valid'); else counterTop.classList.remove('valid');
+
+                counterBottom.innerText = `${bottomCount}/5`;
+                if(bottomCount > 0) counterBottom.classList.add('valid'); else counterBottom.classList.remove('valid');
+            }
+
+            initGame();
+        });
+    </script>
+</body>
+</html>
