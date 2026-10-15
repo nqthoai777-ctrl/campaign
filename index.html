@@ -12,16 +12,14 @@
             --accent-color: #e94560;
             --text-color: #fff;
             
-            /* Màu sắc độ hiếm */
-            --color-ssr: #f39c12; /* Vàng cam */
-            --color-sr: #9b59b6;  /* Tím */
-            --color-r: #2ecc71;   /* Xanh lá */
+            --color-ssr: #f39c12;
+            --color-sr: #9b59b6;
+            --color-r: #2ecc71;
 
-            /* Màu sắc các hệ */
-            --role-fighter: #3498db; /* Xanh dương */
-            --role-mage: #9b59b6;    /* Tím */
-            --role-tank: #d35400;    /* Nâu cam */
-            --role-support: #2ecc71; /* Xanh lá */
+            --role-fighter: #3498db;
+            --role-mage: #9b59b6;
+            --role-tank: #d35400;
+            --role-support: #2ecc71;
         }
 
         body {
@@ -72,7 +70,6 @@
             padding-bottom: 6px;
         }
 
-        /* Thanh Tab chuyển đổi hệ phái */
         .role-tabs {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -208,7 +205,6 @@
             gap: 6px;
         }
 
-        /* Ô vị trí mặc định */
         .slot {
             width: 62px;
             height: 62px;
@@ -241,7 +237,6 @@
             cursor: not-allowed;
         }
 
-        /* Ô đã được đặt tướng có hình nền */
         .slot.filled.ssr {
             border-style: solid;
             border-color: var(--color-ssr);
@@ -257,7 +252,6 @@
             border-color: var(--color-r);
         }
 
-        /* Hiển thị ảnh bên trong ô */
         .slot img.hero-img {
             width: 100%;
             height: 100%;
@@ -267,7 +261,6 @@
             left: 0;
         }
 
-        /* Tên anh hùng đè lên ảnh phía dưới */
         .slot .hero-label {
             position: absolute;
             bottom: 2px;
@@ -356,45 +349,45 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const heroesData = [
-                // FIGHTER (Có gắn link ảnh cho Lucius và Daena)
+                // FIGHTER
                 { name: 'Lucius', role: 'FIGHTER', rarity: 'SSR', image: 'lucius.png' },
                 { name: 'Daena', role: 'FIGHTER', rarity: 'SSR', image: 'daena.png' },
-                { name: 'Gale', role: 'FIGHTER', rarity: 'SSR' },
-                { name: 'Elduin', role: 'FIGHTER', rarity: 'SSR' },
-                { name: 'Arrely', role: 'FIGHTER', rarity: 'SSR' },
-                { name: 'Rydel', role: 'FIGHTER', rarity: 'SR' },
-                { name: 'Alphonse', role: 'FIGHTER', rarity: 'SR' },
-                { name: 'Kelean', role: 'FIGHTER', rarity: 'SR' },
-                { name: 'Avniel', role: 'FIGHTER', rarity: 'SR' },
+                { name: 'Gale', role: 'FIGHTER', rarity: 'SSR', image: 'gale.png' },
+                { name: 'Elduin', role: 'FIGHTER', rarity: 'SSR', image: 'elduin.png' },
+                { name: 'Arrely', role: 'FIGHTER', rarity: 'SSR', image: 'arrely.png' },
+                { name: 'Rydel', role: 'FIGHTER', rarity: 'SR', image: 'rydel.png' },
+                { name: 'Alphonse', role: 'FIGHTER', rarity: 'SR', image: 'alphonse.png' },
+                { name: 'Kelean', role: 'FIGHTER', rarity: 'SR', image: 'kelean.png' },
+                { name: 'Avniel', role: 'FIGHTER', rarity: 'SR', image: 'avniel.png' },
 
                 // MAGE
-                { name: 'Lydia', role: 'MAGE', rarity: 'SSR' },
-                { name: 'Aldrich', role: 'MAGE', rarity: 'SSR' },
-                { name: 'Zania', role: 'MAGE', rarity: 'SSR' },
-                { name: 'Viren', role: 'MAGE', rarity: 'SSR' },
-                { name: 'Gilderion', role: 'MAGE', rarity: 'SSR' },
-                { name: 'Zarkaen', role: 'MAGE', rarity: 'SR' },
-                { name: 'Ludwig', role: 'MAGE', rarity: 'SR' },
-                { name: 'Hikari', role: 'MAGE', rarity: 'SR' },
-                { name: 'Vixara', role: 'MAGE', rarity: 'R' },
+                { name: 'Lydia', role: 'MAGE', rarity: 'SSR', image: 'lydia.png' },
+                { name: 'Aldrich', role: 'MAGE', rarity: 'SSR', image: 'aldrich.png' },
+                { name: 'Zania', role: 'MAGE', rarity: 'SSR', image: 'zania.png' },
+                { name: 'Viren', role: 'MAGE', rarity: 'SSR', image: 'viren.png' },
+                { name: 'Gilderion', role: 'MAGE', rarity: 'SSR', image: 'gilderion.png' },
+                { name: 'Zarkaen', role: 'MAGE', rarity: 'SR', image: 'zarkaen.png' },
+                { name: 'Ludwig', role: 'MAGE', rarity: 'SR', image: 'ludwig.png' },
+                { name: 'Hikari', role: 'MAGE', rarity: 'SR', image: 'hikari.png' },
+                { name: 'Vixara', role: 'MAGE', rarity: 'R', image: 'vixara.png' },
 
                 // TANK
-                { name: 'Graldul', role: 'TANK', rarity: 'SSR' },
-                { name: 'Melaena', role: 'TANK', rarity: 'SSR' },
-                { name: 'Reinhard', role: 'TANK', rarity: 'SSR' },
-                { name: 'Eris', role: 'TANK', rarity: 'SSR' },
-                { name: 'Gilli', role: 'TANK', rarity: 'SR' },
-                { name: 'Julian', role: 'TANK', rarity: 'SR' },
-                { name: 'Thaamira', role: 'TANK', rarity: 'SR' },
+                { name: 'Graldul', role: 'TANK', rarity: 'SSR', image: 'graldul.png' },
+                { name: 'Melaena', role: 'TANK', rarity: 'SSR', image: 'melaena.png' },
+                { name: 'Reinhard', role: 'TANK', rarity: 'SSR', image: 'reinhard.png' },
+                { name: 'Eris', role: 'TANK', rarity: 'SSR', image: 'eris.png' },
+                { name: 'Gilli', role: 'TANK', rarity: 'SR', image: 'gilli.png' },
+                { name: 'Julian', role: 'TANK', rarity: 'SR', image: 'julian.png' },
+                { name: 'Thaamira', role: 'TANK', rarity: 'SR', image: 'thaamira.png' },
 
                 // SUPPORT
-                { name: 'Azarish', role: 'SUPPORT', rarity: 'SSR' },
-                { name: 'Miriel', role: 'SUPPORT', rarity: 'SSR' },
-                { name: 'Iki', role: 'SUPPORT', rarity: 'SR' },
-                { name: 'Daphne', role: 'SUPPORT', rarity: 'SR' },
-                { name: 'Mirjam', role: 'SUPPORT', rarity: 'SR' },
-                { name: 'Ami', role: 'SUPPORT', rarity: 'R' },
-                { name: 'Rafaela', role: 'SUPPORT', rarity: 'R' }
+                { name: 'Azarish', role: 'SUPPORT', rarity: 'SSR', image: 'azarish.png' },
+                { name: 'Miriel', role: 'SUPPORT', rarity: 'SSR', image: 'miriel.png' },
+                { name: 'Iki', role: 'SUPPORT', rarity: 'SR', image: 'iki.png' },
+                { name: 'Daphne', role: 'SUPPORT', rarity: 'SR', image: 'daphne.png' },
+                { name: 'Mirjam', role: 'SUPPORT', rarity: 'SR', image: 'mirjam.png' },
+                { name: 'Ami', role: 'SUPPORT', rarity: 'R', image: 'ami.png' },
+                { name: 'Rafaela', role: 'SUPPORT', rarity: 'R', image: 'rafaela.png' }
             ];
 
             const rarityWeight = { 'SSR': 1, 'SR': 2, 'R': 3 };
@@ -495,10 +488,9 @@
                         const rarityClass = heroObj.rarity.toLowerCase();
                         slot.className = `slot filled ${rarityClass}`;
                         
-                        // Kiểm tra nếu tướng có hình ảnh thì hiển thị thẻ img, nếu không có sẽ chỉ hiện tên
                         let innerContent = '';
                         if (heroObj.image) {
-                            innerContent = `<img src="${heroObj.image}" class="hero-img" alt="${heroObj.name}">`;
+                            innerContent = `<img src="${heroObj.image}" class="hero-img" alt="${heroObj.name}" onerror="this.style.display='none'">`;
                         }
                         innerContent += `
                             <span class="hero-label">${heroObj.name}</span>
@@ -567,3 +559,4 @@
     </script>
 </body>
 </html>
+
