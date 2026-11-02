@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THOẠI CAMPAIGN</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-color: #0d0b1f;
+        --panel-bg: #1a1633;
+        --panel-bg-2: #241d47;
+        --border-color: #3b2f6b;
+        --accent-color: #ff4d6d;
+        --text-color: #e8e6ff;
+        --green: #4ecca3;
+
+        --color-ssr: #ffb020;
+        --color-sr:  #c06bff;
+        --color-r:   #4ee06b;
+
+        --role-fighter: #3fa9ff;
+        --role-mage:    #c06bff;
+        --role-tank:    #ff7a3d;
+        --role-support: #4ee06b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'VT323', monospace;
+        font-size: 20px;
+        background-color: var(--bg-color);
+        background-image:
+            radial-gradient(#1d1840 1px, transparent 1px),
+            radial-gradient(#1d1840 1px, transparent 1px);
+        background-size: 16px 16px;
+        background-position: 0 0, 8px 8px;
+        color: var(--text-color);
+        margin: 0;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        image-rendering: pixelated;
+    }
+
+    h1 {
+        margin: 6px 0;
+        font-size: 32px;
+        line-height: 1.2;
+        color: var(--green);
+        text-align: center;
+        text-shadow: 3px 3px 0 #000, 5px 5px 0 #0a2e22;
+        letter-spacing: 2px;
+    }
+
+    .instructions {
+        font-size: 16px;
+        line-height: 1.4;
+        color: #8a83c0;
+        margin-bottom: 12px;
+        text-align: center;
+        max-width: 90%;
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 650px;
+    }
+
+    .sidebar, .battlefield {
+        background: var(--panel-bg);
+        border: 3px solid var(--border-color);
+        border-radius: 0;
+        padding: 12px;
+        box-shadow:
+            4px 4px 0 #000,
+            inset -3px -3px 0 rgba(0,0,0,0.35),
+            inset 3px 3px 0 rgba(255,255,255,0.05);
+    }
+
+    .sidebar h3 {
+        margin: 0 0 10px 0;
+        font-size: 22px;
+        line-height: 1.2;
+        color: var(--green);
+        text-shadow: 2px 2px 0 #000;
+        border-bottom: 3px solid var(--border-color);
+        padding-bottom: 8px;
+        letter-spacing: 1px;
+    }
+
+    .role-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .tab-btn {
+        font-family: inherit;
+        font-size: 16px;
+        line-height: 1.2;
+        background: var(--panel-bg-2);
+        border: 3px solid #000;
+        color: #8a83c0;
+        padding: 6px 2px;
+        border-radius: 0;
+        cursor: pointer;
+        text-align: center;
+        letter-spacing: 0.5px;
+        box-shadow: 2px 2px 0 #000;
+    }
+    .tab-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0 0 0 #000;
+    }
+    .tab-btn.active {
+        background: var(--green);
+        color: #0d0b1f;
+        border-color: #000;
+        box-shadow: 2px 2px 0 #000, inset -2px -2px 0 rgba(0,0,0,0.25);
+    }
+
+    .hero-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+    .hero-list::-webkit-scrollbar { width: 8px; }
+    .hero-list::-webkit-scrollbar-track { background: #0d0b1f; }
+    .hero-list::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border: 2px solid #000;
+    }
+
+    .hero-item {
+        background: var(--panel-bg-2);
+        padding: 6px 8px;
+        border: 3px solid #000;
+        border-radius: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 18px;
+        line-height: 1.2;
+        cursor: pointer;
+        box-shadow: 2px 2px 0 #000;
+    }
+    .hero-item:active { transform: translate(2px, 2px); box-shadow: none; }
+    .hero-item.selected {
+        background: #2d5c4f;
+        border-color: var(--green);
+        box-shadow: 2px 2px 0 #000, inset 0 0 0 2px rgba(78,204,163,0.35);
+    }
+
+    .hero-info { display: flex; align-items: center; gap: 6px; }
+
+    .hero-name.ssr { color: var(--color-ssr); }
+    .hero-name.sr  { color: var(--color-sr); }
+    .hero-name.r   { color: var(--color-r); }
+
+    .hero-tags { display: flex; gap: 4px; }
+
+    .hero-tag {
+        font-size: 14px;
+        line-height: 1.2;
+        padding: 2px 5px;
+        border-radius: 0;
+        background: #0d0b1f;
+        border: 2px solid currentColor;
+    }
+    .hero-tag.ssr { color: var(--color-ssr); }
+    .hero-tag.sr  { color: var(--color-sr); }
+    .hero-tag.r   { color: var(--color-r); }
+    .hero-tag.fighter { color: var(--role-fighter); }
+    .hero-tag.mage    { color: var(--role-mage); }
+    .hero-tag.tank    { color: var(--role-tank); }
+    .hero-tag.support { color: var(--role-support); }
+
+    .battlefield {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+    }
+
+    .section-zone { display: flex; flex-direction: column; }
+
+    .zone-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--panel-bg-2);
+        border: 3px solid #000;
+        padding: 4px 8px;
+        margin-bottom: 10px;
+        font-size: 18px;
+        line-height: 1.2;
+        color: var(--text-color);
+        letter-spacing: 0.5px;
+        box-shadow: 2px 2px 0 #000;
+    }
+
+    .counter {
+        background: var(--accent-color);
+        color: #0d0b1f;
+        padding: 2px 6px;
+        font-size: 16px;
+        border: 2px solid #000;
+    }
+    .counter.valid { background: var(--green); }
+
+    .grid-10 {
+        display: grid;
+        grid-template-columns: repeat(2, 64px);
+        gap: 8px;
+    }
+    .grid-15 {
+        display: grid;
+        grid-template-columns: repeat(3, 64px);
+        gap: 8px;
+    }
+
+    .slot {
+        width: 64px;
+        height: 64px;
+        border: 3px dashed #4a3f7d;
+        border-radius: 0;
+        background:
+            repeating-linear-gradient(45deg,
+                rgba(255,255,255,0.02) 0 4px,
+                transparent 4px 8px),
+            rgba(20,16,40,0.6);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+        overflow: hidden;
+        box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .slot.selectable {
+        border-color: var(--green);
+        background:
+            repeating-linear-gradient(45deg,
+                rgba(78,204,163,0.12) 0 4px,
+                transparent 4px 8px),
+            rgba(20,40,32,0.6);
+        animation: blink 0.9s steps(2) infinite;
+    }
+    @keyframes blink {
+        0%,100% { border-color: var(--green); }
+        50% { border-color: #2b8a6c; }
+    }
+
+    .slot.unselectable {
+        border-color: var(--accent-color);
+        background:
+            repeating-linear-gradient(45deg,
+                rgba(255,77,109,0.12) 0 4px,
+                transparent 4px 8px),
+            rgba(40,16,24,0.6);
+        cursor: not-allowed;
+    }
+
+    .slot.filled { border-style: solid; }
+    .slot.filled.ssr { border-color: var(--color-ssr); box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), 0 0 8px rgba(255,176,32,0.5); }
+    .slot.filled.sr  { border-color: var(--color-sr);  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), 0 0 8px rgba(192,107,255,0.45); }
+    .slot.filled.r   { border-color: var(--color-r);   box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), 0 0 8px rgba(78,224,107,0.4); }
+
+    .slot img.hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        image-rendering: pixelated;
+        filter: saturate(1.15) contrast(1.05);
+    }
+
+    .slot .hero-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.8);
+        font-size: 13px;
+        line-height: 1.1;
+        padding: 1px 0;
+        text-align: center;
+        z-index: 2;
+        letter-spacing: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .slot.filled.ssr .hero-label { color: var(--color-ssr); }
+    .slot.filled.sr  .hero-label { color: var(--color-sr); }
+    .slot.filled.r   .hero-label { color: var(--color-r); }
+
+    .slot .remove-btn {
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        background: var(--accent-color);
+        color: #fff;
+        border: 2px solid #000;
+        border-radius: 0;
+        width: 16px;
+        height: 16px;
+        font-family: inherit;
+        font-size: 12px;
+        line-height: 1;
+        padding: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 3;
+    }
+    .slot.filled:hover .remove-btn,
+    .slot.filled:active .remove-btn { display: flex; }
+    .slot .remove-btn:active { transform: translate(1px,1px); }
+
+    .notification {
+        margin-top: 8px;
+        color: var(--accent-color);
+        font-size: 16px;
+        line-height: 1.2;
+        text-align: center;
+        min-height: 18px;
+    }
+
+    /* ===== POPUP THÔNG BÁO ===== */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 16px;
+        animation: fadeIn 0.3s steps(4) forwards;
+    }
+    .modal-overlay.hidden { display: none; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .modal-box {
+        background: var(--panel-bg);
+        border: 4px solid var(--green);
+        padding: 20px 18px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 6px 6px 0 #000, inset -3px -3px 0 rgba(0,0,0,0.35);
+        animation: popIn 0.35s steps(5) forwards;
+    }
+
+    @keyframes popIn {
+        0%   { transform: scale(0.6); opacity: 0; }
+        60%  { transform: scale(1.08); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-box h2 {
+        font-size: 22px;
+        line-height: 1.3;
+        color: var(--green);
+        margin: 0 0 12px 0;
+        text-shadow: 2px 2px 0 #000;
+        letter-spacing: 1px;
+    }
+
+    .modal-box p {
+        font-size: 18px;
+        line-height: 1.4;
+        color: var(--text-color);
+        margin: 0 0 16px 0;
+    }
+
+    .modal-box .modal-btn {
+        font-family: inherit;
+        font-size: 18px;
+        background: var(--green);
+        color: #0d0b1f;
+        border: 3px solid #000;
+        padding: 8px 24px;
+        cursor: pointer;
+        box-shadow: 3px 3px 0 #000;
+        letter-spacing: 1px;
+    }
+    .modal-box .modal-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: none;
+    }
+
+    /* ===== LINK DISCORD CUỐI TRANG ===== */
+    .discord-footer {
+        margin: 20px 0 10px 0;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .discord-footer a {
+        color: #7289da;
+        text-decoration: none;
+        border-bottom: 2px dashed #7289da;
+        padding-bottom: 2px;
+        transition: color 0.15s;
+    }
+    .discord-footer a:hover {
+        color: #a7b8ff;
+        border-bottom-color: #a7b8ff;
+    }
+</style>
+</head>
+<body>
+
+    <!-- POPUP THÔNG BÁO -->
+    <div class="modal-overlay" id="noticePopup">
+        <div class="modal-box">
+            <h2>THÔNG BÁO</h2>
+            <p>TUI SỦI GAME RỒI NHA MẤY NÍ, NÍ NÀO MUỐN UPDATE GÌ THÊM THÌ IB DIS TUI</p>
+            <button class="modal-btn" onclick="document.getElementById('noticePopup').classList.add('hidden')">OK</button>
+        </div>
+    </div>
+
+    <h1>THOẠI CAMPAIGN</h1>
+    <div class="instructions">Chọn hệ, chạm tướng rồi chọn ô để xếp hoặc hoán đổi vị trí.</div>
+
+    <div class="game-container">
+        <div class="sidebar">
+            <h3>Danh Sách Tướng</h3>
+            <div class="role-tabs">
+                <button class="tab-btn active" onclick="switchRole('FIGHTER')">FIGHTER</button>
+                <button class="tab-btn" onclick="switchRole('MAGE')">MAGE</button>
+                <button class="tab-btn" onclick="switchRole('TANK')">TANK</button>
+                <button class="tab-btn" onclick="switchRole('SUPPORT')">SUPPORT</button>
+            </div>
+            <div class="hero-list" id="heroList"></div>
+            <div class="notification" id="notification"></div>
+        </div>
+
+        <div class="battlefield">
+            <div class="section-zone">
+                <div class="zone-header">
+                    <span>FORTRESS</span>
+                    <span class="counter" id="counterTop">0/10</span>
+                </div>
+                <div class="grid-10" id="zoneTop"></div>
+            </div>
+
+            <div class="section-zone">
+                <div class="zone-header">
+                    <span>FIELD</span>
+                    <span class="counter" id="counterBottom">0/5</span>
+                </div>
+                <div class="grid-15" id="zoneBottom"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LINK DISCORD CUỐI TRANG -->
+    <div class="discord-footer">
+        Discord của tui: 
+        <a href="https://discord.gg/x5t8dych" target="_blank" rel="noopener noreferrer">
+            discord.gg/x5t8dych
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heroesData = [
+                // ================= FIGHTER =================
+                { name: 'Lucius',    role: 'FIGHTER', rarity: 'SSR', image: 'lucius.png' },
+                { name: 'Daena',     role: 'FIGHTER', rarity: 'SSR', image: 'daena.png' },
+                { name: 'Gale',      role: 'FIGHTER', rarity: 'SSR', image: 'gale.png' },
+                { name: 'Elduin',    role: 'FIGHTER', rarity: 'SSR', image: 'elduin.png' },
+                { name: 'Arrely',    role: 'FIGHTER', rarity: 'SSR', image: 'arrely.png' },
+                { name: 'Rydel',     role: 'FIGHTER', rarity: 'SR',  image: 'rydel.png' },
+                { name: 'Alphonse',  role: 'FIGHTER', rarity: 'SR',  image: 'alphonse.png' },
+                { name: 'Kelean',    role: 'FIGHTER', rarity: 'SR',  image: 'kelean.png' },
+                { name: 'Avniel',    role: 'FIGHTER', rarity: 'SR',  image: 'avniel.png' },
+
+                // ================= MAGE =================
+                { name: 'Lydia',              role: 'MAGE', rarity: 'SSR', image: 'lydia.png' },
+                { name: 'Aldrich',            role: 'MAGE', rarity: 'SSR', image: 'aldrich.png' },
+                { name: 'Zania',              role: 'MAGE', rarity: 'SSR', image: 'zania.png' },
+                { name: 'Viren',              role: 'MAGE', rarity: 'SSR', image: 'viren.png' },
+                { name: 'Gilderion',          role: 'MAGE', rarity: 'SSR', image: 'gilderion.png' },
+                { name: 'Vixara Nine-tailed', role: 'MAGE', rarity: 'SSR', image: 'vixara_ninetailed.png' },
+                { name: 'Zarkaen',            role: 'MAGE', rarity: 'SR',  image: 'zarkaen.png' },
+                { name: 'Ludwig',             role: 'MAGE', rarity: 'SR',  image: 'ludwig.png' },
+                { name: 'Hikari',             role: 'MAGE', rarity: 'SR',  image: 'hikari.png' },
+                { name: 'Vixara',             role: 'MAGE', rarity: 'R',   image: 'vixara.png' },
+
+                // ================= TANK =================
+                { name: 'Graldul',   role: 'TANK', rarity: 'SSR', image: 'graldul.png' },
+                { name: 'Melaena',   role: 'TANK', rarity: 'SSR', image: 'melaena.png' },
+                { name: 'Reinhard',  role: 'TANK', rarity: 'SSR', image: 'reinhard.png' },
+                { name: 'Eris',      role: 'TANK', rarity: 'SSR', image: 'eris.png' },
+                { name: 'Gilli',     role: 'TANK', rarity: 'SR',  image: 'gilli.png' },
+                { name: 'Julian',    role: 'TANK', rarity: 'SR',  image: 'julian.png' },
+                { name: 'Thaamira',  role: 'TANK', rarity: 'SR',  image: 'thaamira.png' },
+
+                // ================= SUPPORT =================
+                { name: 'Azarish',  role: 'SUPPORT', rarity: 'SSR', image: 'azarish.png' },
+                { name: 'Miriel',   role: 'SUPPORT', rarity: 'SSR', image: 'miriel.png' },
+                { name: 'Iki',      role: 'SUPPORT', rarity: 'SR',  image: 'iki.png' },
+                { name: 'Daphne',   role: 'SUPPORT', rarity: 'SR',  image: 'daphne.png' },
+                { name: 'Mirjam',   role: 'SUPPORT', rarity: 'SR',  image: 'mirjam.png' },
+                { name: 'Ami',      role: 'SUPPORT', rarity: 'R',   image: 'ami.png' },
+                { name: 'Rafaela',  role: 'SUPPORT', rarity: 'R',   image: 'rafaela.png' }
+            ];
+
+            const rarityWeight = { 'SSR': 1, 'SR': 2, 'R': 3 };
+            heroesData.sort((a, b) => rarityWeight[a.rarity] - rarityWeight[b.rarity]);
+
+            let topSlots = Array(10).fill(null);
+            let bottomSlots = Array(15).fill(null);
+            let selectedHeroForMobile = null;
+            let currentRole = 'FIGHTER';
+
+            window.switchRole = function(role) {
+                currentRole = role;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    if (btn.innerText.toUpperCase() === role) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                renderHeroList();
+            }
+
+            function initGame() {
+                renderHeroList();
+                renderSlots('zoneTop', topSlots, 10, 'top');
+                renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                updateCounters();
+            }
+
+            function showNotification(msg) {
+                const notif = document.getElementById('notification');
+                notif.innerText = msg;
+                setTimeout(() => { if (notif.innerText === msg) notif.innerText = ''; }, 3000);
+            }
+
+            window.unassignSlot = function(event, zoneType, index) {
+                event.stopPropagation();
+                if (zoneType === 'top') topSlots[index] = null;
+                else bottomSlots[index] = null;
+                renderSlots('zoneTop', topSlots, 10, 'top');
+                renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                updateCounters();
+            }
+
+            function renderHeroList() {
+                const listEl = document.getElementById('heroList');
+                listEl.innerHTML = '';
+                const filtered = heroesData.filter(h => h.role === currentRole);
+
+                filtered.forEach(hero => {
+                    const rarityClass = hero.rarity.toLowerCase();
+                    const roleClass = hero.role.toLowerCase();
+                    const isSelected = selectedHeroForMobile && selectedHeroForMobile.name === hero.name;
+
+                    const item = document.createElement('div');
+                    item.className = `hero-item ${isSelected ? 'selected' : ''}`;
+                    item.innerHTML = `
+                        <div class="hero-info">
+                            <span class="hero-name ${rarityClass}">${hero.name}</span>
+                        </div>
+                        <div class="hero-tags">
+                            <span class="hero-tag ${rarityClass}">${hero.rarity}</span>
+                            <span class="hero-tag ${roleClass}">${hero.role}</span>
+                        </div>
+                    `;
+
+                    item.onclick = () => {
+                        selectedHeroForMobile = hero;
+                        renderHeroList();
+                        renderSlots('zoneTop', topSlots, 10, 'top');
+                        renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                        showNotification(`Đã chọn: ${hero.name} [${hero.rarity}]`);
+                    };
+
+                    listEl.appendChild(item);
+                });
+            }
+
+            function renderSlots(containerId, slotsArray, maxAllowed, zoneType) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                const currentCount = slotsArray.filter(h => h !== null).length;
+                const isFull = currentCount >= maxAllowed;
+
+                slotsArray.forEach((heroObj, index) => {
+                    const slot = document.createElement('div');
+
+                    if (heroObj) {
+                        const rarityClass = heroObj.rarity.toLowerCase();
+                        slot.className = `slot filled ${rarityClass}`;
+
+                        let innerContent = '';
+                        if (heroObj.image) {
+                            innerContent = `<img src="${heroObj.image}" class="hero-img" alt="${heroObj.name}" onerror="this.style.display='none'">`;
+                        }
+                        innerContent += `
+                            <span class="hero-label">${heroObj.name}</span>
+                            <button class="remove-btn" onclick="unassignSlot(event, '${zoneType}', ${index})">×</button>
+                        `;
+                        slot.innerHTML = innerContent;
+                    } else {
+                        slot.className = 'slot';
+                        if (selectedHeroForMobile) {
+                            if (isFull) slot.classList.add('unselectable');
+                            else slot.classList.add('selectable');
+                        }
+                    }
+
+                    slot.onclick = () => {
+                        if (!selectedHeroForMobile && !heroObj) return;
+
+                        if (!selectedHeroForMobile && heroObj) {
+                            showNotification('Hãy chọn tướng mới từ danh sách để thay thế!');
+                            return;
+                        }
+
+                        if (!heroObj && isFull) {
+                            showNotification(`Khu vực này đã đạt tối đa ${maxAllowed} tướng! Chỉ có thể hoán đổi.`);
+                            return;
+                        }
+
+                        assignHeroToSlot(selectedHeroForMobile, zoneType, index, maxAllowed);
+                        selectedHeroForMobile = null;
+                        renderHeroList();
+                        renderSlots('zoneTop', topSlots, 10, 'top');
+                        renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                    };
+
+                    container.appendChild(slot);
+                });
+            }
+
+            function assignHeroToSlot(heroObj, zoneType, index, maxAllowed) {
+                let targetArray = zoneType === 'top' ? topSlots : bottomSlots;
+                targetArray[index] = heroObj;
+                renderSlots('zoneTop', topSlots, 10, 'top');
+                renderSlots('zoneBottom', bottomSlots, 5, 'bottom');
+                updateCounters();
+            }
+
+            function updateCounters() {
+                const topCount = topSlots.filter(h => h !== null).length;
+                const bottomCount = bottomSlots.filter(h => h !== null).length;
+
+                const counterTop = document.getElementById('counterTop');
+                const counterBottom = document.getElementById('counterBottom');
+
+                counterTop.innerText = `${topCount}/10`;
+                if (topCount > 0) counterTop.classList.add('valid'); else counterTop.classList.remove('valid');
+
+                counterBottom.innerText = `${bottomCount}/5`;
+                if (bottomCount > 0) counterBottom.classList.add('valid'); else counterBottom.classList.remove('valid');
+            }
+
+            initGame();
+        });
+    </script>
+</body>
+</html>
